@@ -7,7 +7,6 @@ on:
 jobs:
   trigger:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -22,7 +21,7 @@ jobs:
           BRANCH_NAME=${{ github.head_ref }}
 
           # Trigger Gitlab Pipeline
-          curl --request POST "${GITLAB_URL}/api/v4/projects/${GITLAB_PROJECT_ID}/trigger/pipeline" \
-            --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
-            --form "ref=${BRANCH_NAME}" \
-            --form "token=${{ secrets.GITLAB_TRIGGER_TOKEN }}"
+          curl --request POST \
+               --form token=${{ secrets.GITLAB_TRIGGER_TOKEN }} \
+               --form ref=${BRANCH_NAME} \
+               "${GITLAB_URL}/api/v4/projects/${GITLAB_PROJECT_ID}/trigger/pipeline"
