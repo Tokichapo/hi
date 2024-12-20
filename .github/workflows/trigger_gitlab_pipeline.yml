@@ -1,4 +1,4 @@
-name: Trigger Gitlab Pipeline
+name: Trigger GitLab Pipeline
 
 on:
   pull_request:
@@ -11,17 +11,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Trigger Gitlab Pipeline
+      - name: Log Branch Name
+        run: echo "BRANCH_NAME=${{ github.head_ref }}"
+
+      - name: URL Encode Branch Name
+        id: encode_branch
+        run: echo "ENCODED_BRANCH_NAME=$(echo '${{ github.head_ref }}' | jq -sRr @uri)" >> $GITHUB_ENV
+
+      - name: Trigger GitLab Pipeline
         env:
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
           GITLAB_PROJECT_ID: ${{ secrets.GITLAB_PROJECT_ID }}
           GITLAB_URL: https://gitlab.com
         run: |
-          # Get branch name from pull request
-          BRANCH_NAME=${{ github.head_ref }}
-
-          # Trigger Gitlab Pipeline
+          # Trigger GitLab Pipeline
           curl --request POST \
-               --form token=${{ secrets.GITLAB_TRIGGER_TOKEN }} \
-               --form ref=${BRANCH_NAME} \
+               --form token="${{ secrets.GITLAB_TRIGGER_TOKEN }}" \
+               --form ref="${{ env.ENCODED_BRANCH_NAME }}" \
                "${GITLAB_URL}/api/v4/projects/${GITLAB_PROJECT_ID}/trigger/pipeline"
