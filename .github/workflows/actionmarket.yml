@@ -6,19 +6,21 @@ on:
 
 jobs:
   trigger-gitlab-ci:
-    name: Trigger GitLab CI job
+    name: Trigger GitLab CI Job
     runs-on: ubuntu-latest
 
     steps:
-      # Optional: Checkout code if GitLab needs to access it, you can skip this if not needed
+      # Optional: Checkout code if GitLab needs to access it
       - name: Checkout code
-        uses: actions/checkout@v2  # You can skip this step if GitLab does not require the code from GitHub
+        uses: actions/checkout@v2  # Ensure the code is available if needed by GitLab pipeline
 
+      # Trigger GitLab CI Job using the GitHub Marketplace Action
       - name: Trigger GitLab CI Job
-        uses: appleboy/gitlab-ci-action@0.0.1
+        uses: appleboy/gitlab-ci-action@v1.3.0
         with:
-          host: ${{ secrets.GITLAB_HOST }}  # GitLab instance URL (e.g., https://gitlab.com for GitLab's cloud service)
-          token: ${{ secrets.GITLAB_TOKEN }}  # GitLab Personal Access Token (with api scope)
-          project_id: ${{ secrets.GITLAB_PROJECT_ID }}  # GitLab project ID (numeric ID of your GitLab repository)
-          ref: ${{ github.head_ref }}  # The branch or commit ref that triggered the PR (usually the branch name)
-          trigger_token: ${{ secrets.GITLAB_TRIGGER_TOKEN }}  # Optional: GitLab CI/CD Trigger Token (if required)
+          entryPoint: |
+            curl --request POST --form "token=${{ secrets.GITLAB_TRIGGER_TOKEN }}" \
+              --form "ref=${{ github.head_ref }}" \
+              "https://gitlab.com/api/v4/projects/${{ secrets.GITLAB_PROJECT_ID }}/trigger/pipeline"
+          args: |
+            --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_TOKEN }}" # Optional: GitLab Personal Access Token (with api scope)
