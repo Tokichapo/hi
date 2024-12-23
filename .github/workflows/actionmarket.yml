@@ -10,11 +10,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Trigger GitLab Job
-        uses: ghcr.io/appleboy/gitlab-ci-action@v1.3.0
+      - name: Trigger GitLab CI Job
+        uses: appleboy/gitlab-ci-action@0.0.1
         with:
-          host: ${{ secrets.GITLAB_HOST }}  # GitLab instance URL (e.g., https://gitlab.com or your custom GitLab URL)
+          host: ${{ secrets.GITLAB_HOST }}  # GitLab instance URL (https://gitlab.com for GitLab's cloud service)
           token: ${{ secrets.GITLAB_TOKEN }}  # GitLab Personal Access Token (with api scope)
           project_id: ${{ secrets.GITLAB_PROJECT_ID }}  # GitLab project ID (your GitLab repository ID)
           ref: ${{ github.head_ref }}  # The branch or commit ref that triggered the PR (usually the branch name)
           trigger_token: ${{ secrets.GITLAB_TRIGGER_TOKEN }}  # Optional: GitLab CI/CD Trigger Token (if required)
+
