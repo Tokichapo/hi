@@ -49,4 +49,4 @@ deploy:
 after_script:
 - echo "Running cleanup tasks"
 sast:
-  stage: test
+  stage: test 
