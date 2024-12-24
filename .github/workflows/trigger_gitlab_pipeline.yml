@@ -1,28 +1,20 @@
-name: Trigger Gitlab Pipeline
+name: Trigger GitLab CI on Pull Request
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize, reopened]  # Trigger on PR open, synchronize (commit push), and reopen events
 
 jobs:
-  trigger:
+  trigger-gitlab-ci:
+    name: Trigger GitLab CI job
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Trigger Gitlab Pipeline
-        env:
-          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
-          GITLAB_PROJECT_ID: ${{ secrets.GITLAB_PROJECT_ID }}
-          GITLAB_URL: https://gitlab.com
-        run: |
-          # Get branch name from pull request
-          BRANCH_NAME=${{ github.head_ref }}
-
-          # Trigger Gitlab Pipeline
-          curl --request POST "${GITLAB_URL}/api/v4/projects/${GITLAB_PROJECT_ID}/trigger/pipeline" \
-            --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
-            --form "ref=${BRANCH_NAME}" \
-            --form "token=${{ secrets.GITLAB_TRIGGER_TOKEN }}"
+      - name: Trigger GitLab Job
+        uses: ghcr.io/appleboy/gitlab-ci-action@v1.3.0
+        with:
+          host: ${{ secrets.GITLAB_HOST }}  # GitLab instance URL (e.g., https://gitlab.com or your self-hosted GitLab URL)
+          token: ${{ secrets.GITLAB_TOKEN }}  # GitLab Personal Access Token (with appropriate permissions like api)
+          project_id: ${{ secrets.GITLAB_PROJECT_ID }}  # GitLab project ID (your GitLab repository ID)
+          ref: ${{ github.head_ref }}  # The branch or commit ref that triggered the PR (usually the branch name)
+          trigger_token: ${{ secrets.GITLAB_TRIGGER_TOKEN }}  # Optional: GitLab CI/CD Trigger Token (if required)
