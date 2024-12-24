@@ -17,17 +17,20 @@ build:
   script:
     - echo "Building project for branch $CI_COMMIT_REF_NAME"
   rules:
-    - if: '$CI_COMMIT_REF_NAME' # Run for all branches
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run for merge requests
+    - if: '$CI_COMMIT_REF_NAME'  # Run for all branches
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'  # Run for merge requests
 
-# Test Job (runs for all branches and PRs)
+# Test Job (runs for all branches and PRs, includes SAST scan)
 test:
   stage: test
   script:
     - echo "Running tests for branch $CI_COMMIT_REF_NAME"
+    - echo "Running SAST scan..."
+    # This is where the SAST scan will be triggered based on the included template
+    # No additional setup needed, SAST will run as part of the included template
   rules:
-    - if: '$CI_COMMIT_REF_NAME' # Run for all branches
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run for merge requests
+    - if: '$CI_COMMIT_REF_NAME'  # Run for all branches
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'  # Run for merge requests
 
 # Deploy Job (runs for all branches and PRs)
 deploy:
@@ -35,8 +38,8 @@ deploy:
   script:
     - echo "Deploying project for branch $CI_COMMIT_REF_NAME"
   rules:
-    - if: '$CI_COMMIT_REF_NAME' # Run for all branches
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # Run for merge requests
+    - if: '$CI_COMMIT_REF_NAME'  # Run for all branches
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'  # Run for merge requests
 
 # Optional: Cleanup after all jobs are complete
 after_script:
